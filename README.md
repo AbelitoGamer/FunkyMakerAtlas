@@ -1,9 +1,2 @@
-# AbelRAMU.github.io
-
-
-
-[]()
-[Recreacion]()
-
-
-![]()
+# FunkyMakerAtlas.github.io
+No asociado a KING GC
