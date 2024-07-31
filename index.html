@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Destiny</title>
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="Bootstrap/css/custom.css">
+    <link rel="stylesheet" href="Bootstrap/css/font/stylesheet.css">
+    <script src="Bootstrap/js/jquery-3.7.1.js"></script>
+    <style>
+        body {
+            background-color: #000;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            background-image: url(Resources/images/Estatica\ papu0000.gif);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .destiny-container {
+            max-width: 90%;
+            margin: 0 auto;
+            padding-bottom: 20px;
+        }
+        h1 {
+            text-shadow: 2px 2px 4px #ff0000;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background-color: transparent;
+            border: none;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+        }
+        .card:hover, .card.active {
+            filter: brightness(1.5);
+        }
+        .card-img-top {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        .top-row .col:first-child .card {
+            aspect-ratio: 2/3;
+        }
+        .bottom-row .card {
+            aspect-ratio: 16/5;
+        }
+    </style>
+</head>
+<body>
+    <audio src="Resources/audio/Menu.ogg" autoplay loop></audio>
+    
+    <div class="destiny-container mt-5">
+        <h1 class="text-center"><img src="Resources/images/Title0000.gif" class="card-img" alt="Mushroom Kingdom" style="width: 40%;"></h1>
+        <div class="row top-row g-3 mb-4">
+            <div class="col">
+                <div class="card">
+                    <img src="Resources/images/Mainweek0000.gif" class="card-img" alt="Mushroom Kingdom">
+                    <a href="W1.html" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <img src="Resources/images/Island0000.gif" class="card-img-top" alt="Irregularity Island">
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <img src="Resources/images/Woodland0000.gif" class="card-img-top" alt="Woodland Forest">
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <img src="Resources/images/Cosmos0000.gif" class="card-img-top" alt="Cosmic Cosmos">
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <img src="Resources/images/Heights0000.gif" class="card-img-top" alt="Delirious Heights">
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <img src="Resources/images/Classified0000.gif" class="card-img-top" alt="Classified Castle">
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+        <div class="row bottom-row g-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <img src="Resources/images/Legacy0000.gif" class="card-img-top" alt="Legacy Mode">
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <img src="Resources/images/Extra0000.gif" class="card-img-top" alt="Extra Content">
+                    <a href="#" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="Bootstrap/js/bootstrap.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.card').click(function() {
+                $('.card').removeClass('active');
+                $(this).addClass('active');
+            });
+        });
+    </script>
+</body>
+</html>
