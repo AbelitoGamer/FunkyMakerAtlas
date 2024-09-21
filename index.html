@@ -9,106 +9,89 @@
     <link rel="stylesheet" href="/Bootstrap/css/font/stylesheet.css">
     <script src="/Bootstrap/js/jquery-3.7.1.js"></script>
     <style>
-        body {
-            background-color: #000;
-            color: #ff0000;
-            font-family: 'Courier New', monospace;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .destiny-container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            text-shadow: 2px 2px 4px #ff0000;
-            font-size: clamp(2rem, 5vw, 3rem);
-            margin-bottom: 2rem;
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-right: 15px;
         }
         .card {
-            background-color: transparent;
-            border: none;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
-            aspect-ratio: 3/4;
-            overflow: hidden;
+            margin-bottom: 20px;
+            transition: transform 0.2s ease-in-out;
         }
-        .card:hover, .card.active {
-            filter: brightness(1.5);
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .card-img-top {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+        .card-link {
+            color: inherit;
+            text-decoration: none;
         }
-        .top-row .col:first-child .card {
-            aspect-ratio: 2/3;
-        }
-        .bottom-row .card {
-            aspect-ratio: 16/5;
-        }
-        
-        @media (max-width: 768px) {
-            .destiny-container {
-                padding: 10px;
-            }
-            .top-row {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            .top-row .col {
-                width: 100%;
-            }
-            .card {
-                aspect-ratio: auto;
-                height: auto;
-                min-height: 150px;
-            }
-            .card-img-top {
-                height: 100%;
-                object-fit: contain;
-            }
-            .bottom-row .card {
-                aspect-ratio: auto;
-                height: auto;
-                min-height: 100px;
-            }
-            h1 img {
-                width: 80% !important;
-                max-width: 300px;
-            }
+        .card-link:hover {
+            color: inherit;
         }
     </style>
 </head>
 <body>
-    <audio src="/Resources/audio/Freeplay.ogg" autoplay loop></audio>
-    
-    <div class="destiny-container mt-5">
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>Oops!</strong> Este parece un buen lugar para un menu, pero lamentablemente aun no hay nada.<br>
-        Sientete libre de usar ese boton para ir al <strong>Port de Mario Madness</strong>.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-
-        <a class="btn btn-dark" href="Mario-Madness/Freeplay.html" role="button">Mario Madness V2</a>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Funky Atlas</h1>
+        <h2 class="text-center mb-5">El portal entre creaciones relacionadas a FMM</h2>
         
+        <div id="card-container" class="row">
         </div>
+    </div>
 
-
-    <script src="/Bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="Bootstrap/js/jquery-3.7.1.js"></script>
+    <script src="Bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.card').click(function() {
-                $('.card').removeClass('active');
-                $(this).addClass('active');
-            });
+            const cards = [
+                {
+                    icon: '/Resources/images/MMV2.png',
+                    title: 'Mario Madness V2 FMM Port',
+                    text: 'Una pagina para descargar facilmente todas las canciones del port de Mario Madness V2 a Funky Maker: Mobile! / Se esta trabajando en un rework de todos los niveles.',
+                    link: '/Mario-Madness/Freeplay.html'
+                },
+                {
+                    icon: '/Resources/images/FFix.png',
+                    title: 'NEW! - Funky Fixer',
+                    text: 'Dejame adivinar, cerraste, o te crasheo la app mientras hacias un objeto nuevo, y cuando lo intentaste volver a abrir, el cabron ya no quiere. Pues no te despeines, solo pon el .FNMM rebelde aqui y deja que la pagina lo arregle. ¡De nada! PD: La pagina es fea de cojones ahora mismo. Ya la estilizare luego.',
+                    link: '/FNMMFixer/FNMMFixer.html' 
+                },
+                {
+                    icon: '/Resources/images/Ring.png',
+                    title: '??????????????????',
+                    text: '',
+                    link: 'index.html'
+                }
+            ];
+
+            function createCard(card) {
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <a href="${card.link}" class="card-link">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="${card.icon}" alt="${card.title} icon" class="card-icon">
+                                        ${card.title}
+                                    </h5>
+                                    <p class="card-text">${card.text}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }
+
+            function renderCards() {
+                const cardContainer = $('#card-container');
+                cards.forEach(card => {
+                    cardContainer.append(createCard(card));
+                });
+            }
+
+            renderCards();
         });
     </script>
 </body>
