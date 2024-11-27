@@ -1,104 +1,207 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home...?</title>
-    <link rel="stylesheet" href="/Bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="/Bootstrap/css/custom.css">
-    <link rel="stylesheet" href="/Bootstrap/css/font/stylesheet.css">
-    <script src="/Bootstrap/js/jquery-3.7.1.js"></script>
+    <title>Funky Atlas</title>
     <style>
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            margin-right: 15px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
+
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            font-size: 1.2rem;
+            color: #cccccc;
+        }
+
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
         .card {
-            margin-bottom: 20px;
-            transition: transform 0.2s ease-in-out;
+            position: relative;
+            height: 200px;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: stretch;
         }
+
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .card-link {
-            color: inherit;
-            text-decoration: none;
+
+        .card-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px);
+            opacity: 0.6;
+            z-index: 1;
         }
-        .card-link:hover {
-            color: inherit;
+
+        .card-image {
+            width: 40%;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ff4444;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .card-text {
+            color: #ffffff;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header h2 {
+                font-size: 1rem;
+            }
+
+            .card {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .card-image {
+                width: 100%;
+                height: 200px;
+            }
+
+            .card-content {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Funky Atlas</h1>
-        <h2 class="text-center mb-5">El portal entre creaciones relacionadas a FMM</h2>
-        
-        <div id="card-container" class="row">
-        </div>
+    <div class="header">
+        <h1>Funky Atlas</h1>
+        <h2>El portal entre creaciones relacionadas a FMM</h2>
     </div>
 
-    <script src="Bootstrap/js/jquery-3.7.1.js"></script>
-    <script src="Bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            const cards = [
-                {
-                    icon: '/Resources/images/MMV2.png',
-                    title: 'Mario Madness V2 FMM Port',
-                    text: 'Una pagina para descargar facilmente todas las canciones del port de Mario Madness V2 a Funky Maker: Mobile! / Se esta trabajando en un rework de todos los niveles.',
-                    link: '/Mario-Madness/Freeplay.html'
-                },
-                {
-                    icon: '/Resources/images/FFix.png',
-                    title: 'Funky Fixer',
-                    text: 'Dejame adivinar, cerraste, o te crasheo la app mientras hacias un objeto nuevo, y cuando lo intentaste volver a abrir, el cabron ya no quiere. Pues no te despeines, solo pon el .FNMM rebelde aqui y deja que la pagina lo arregle. ¡De nada! PD: La pagina es fea de cojones ahora mismo. Ya la estilizare luego.',
-                    link: '/FNMMFixer/FNMMFixer.html' 
-                },
-                {
-                    icon: '/Resources/images/FtoF/xmlicon.png',
-                    title: 'NEW! - Funkin to Funky!',
-                    text: 'Si el tutorial de angg no te parece lo suficientemente claro, te tengo esta pagina. Sube el spritesheet y el XML, y los ordenara por ti en el formato de FMM. A cambio de un ligerisimo desplazamiento que no he podido arreglar, pero hey, te sirve para el catalogo.',
-                    link: '/FunkIntoFunky/SheetConverter.html'
-                },
-                {
-                    icon: '/Resources/images/Ring.png',
-                    title: 'Sonic.exe',
-                    text: 'Lo unico que da mas miedo que Sonic.exe en si, son sus fans. Adentrate en la gigacoleccion de niveles porteados de Sonic.exe y todas sus variaciones a FMM, desde esta bastante decorada pagina. Creditos a justfenix y a todos los miembros del foro de sonic.exe por hacerla posible.',
-                    link: 'https://thisisfenix.github.io/Countdownsonic.exe/start.html'
-                }
-            ];
+    <div class="card-container">
+        <!--MMV2 PORT-->
+        <a href="/Mario-Madness/Freeplay.html" class="card">
+            <div class="card-background" style="background-image: url('Resources/images/MMV2Banner.png');"></div>
+            <div class="card-image">
+                <img src="/Resources/images/MMV2Banner.png" alt="Mario Madness">
+            </div>
+            <div class="card-content">
+                <h3 class="card-title">Mario's Madness V2 - Funky Maker: Mobile! Port</h3>
+                <p class="card-text">
+                    Un port de casi todas las canciones de Mario's Madness V2 a Funky Maker. 
+                    Creado por el Foro de MMV2 en discord y dirijido por @josi465.
+                    <span style="color: red;">TOMA EN CUENTA:</span> <span style="color: gray;">Este port esta obsoleto y siendo reworkeado en su totalidad por un team
+                    ligeramente distinto. Los niveles en esta pagina seran reemplazados por sus versiones 
+                    mejoradas una vez se termine dicho rework. Si buscas jugar a un port fiel de Mario's Madness, quizas
+                    deberias esperar un poco.</span>
 
-            function createCard(card) {
-                return `
-                    <div class="col-md-6 col-lg-4">
-                        <a href="${card.link}" class="card-link">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        <img src="${card.icon}" alt="${card.title} icon" class="card-icon">
-                                        ${card.title}
-                                    </h5>
-                                    <p class="card-text">${card.text}</p>
-                                </div>
-                            </div>
-                        </a>
+                </p>
+            </div>
+        </a>
+    </div>
+
+        <div class="card-container">
+            <!-- El pinxi sonic punto archivo ejecutable guei-->
+            <a href="https://thisisfenix.github.io/Countdownsonic.exe/start.html" class="card">
+                <div class="card-background" style="background-image: url('Resources/images/SonicBanner.png');"></div>
+                <div class="card-image">
+                    <img src="/Resources/images/SonicBanner.png" alt="Mario Madness">
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Sonic.exe (Pagina del foro)</h3>
+                    <p class="card-text">
+                    Una pagina web compilando todos los niveles salidos del Foro de sonic.exe, ubicado dentro del servidor de discord
+                    de Funky Maker Mobile. Ciertamente mucho mas practico que buscarlos uno a uno alli dentro. 
+                    <span style="color: gray;">Creditos a thisisankush (Creador del foro y pagina). 
+                    Los creditos de cada integrante individual de dicho foro pueden ser encontrados dentro.
+                    </span>
+                        
+                    </p>
+                </div>
+            </a>
+        </div>
+
+            <div class="card-container">
+                <!-- Abelito -->
+                <a href="workshop.html" class="card">
+                    <div class="card-background" style="background-image: url('Resources/images/AbelitoWorkshopBannerDifum.png');"></div>
+                    <div class="card-image">
+                        <img src="/Resources/images/AbelitoWorkshopBanner.png" alt="Mario Madness">
                     </div>
-                `;
-            }
-
-            function renderCards() {
-                const cardContainer = $('#card-container');
-                cards.forEach(card => {
-                    cardContainer.append(createCard(card));
-                });
-            }
-
-            renderCards();
-        });
-    </script>
+                    <div class="card-content">
+                        <h3 class="card-title">Abelito's workshop</h3>
+                        <p class="card-text">
+                        Experimentos pendejos de Abelito que al igual que esta misma pagina de inicio, pecan de estar hechos
+                        mayormente por IA. Algun dia se volvera autonomo, confien. Mientras tanto, puedes echarle un vistazo a las
+                        herramientas o cositas random que se ha estado aventando de vez en cuando desde aqui dentro.
+                        </p>
+                    </div>
+                </a>
+    </div>
+</div>
 </body>
 </html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home...?</title>
+    <link rel="stylesheet" href="/Bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/Bootstrap/css/custom.css">
+    <link rel="stylesheet" href="/Bootstrap/css/font/stylesheet.css">
+    <script src="/Bootstrap/js/jquery-3.7.1.js"></script>
+    <style>
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-right: 15px;
+        }
+        .card {
+            margin-bottom: 20px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card-link {
+            color: inherit;
+            text-decoration: none;
+        }
+        .card-link:hover {
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Abelito's workshop</h1>
+        <h3 class="text-center mb-5">Experimentos pendejos, 90% IA. Quizas a ti te sirvan de algo</h3>
+        
+        <div id="card-container" class="row">
+        </div>
+    </div>
+
+    <script src="Bootstrap/js/jquery-3.7.1.js"></script>
+    <script src="Bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const cards = [
+                {
+                    icon: '/Resources/images/FFix.png',
+                    title: 'Funky Fixer (Obsoleto)',
+                    text: 'Dejame adivinar, cerraste, o te crasheo la app mientras hacias un objeto nuevo, y cuando lo intentaste volver a abrir, el cabron ya no quiere. Pues no te despeines, solo pon el .FNMM rebelde aqui y deja que la pagina lo arregle. ¡De nada!',
+                    link: '/FNMMFixer/FNMMFixer.html' 
+                },
+                {
+                    icon: '/Resources/images/FtoF/xmlicon.png',
+                    title: 'Funkin to Funky!',
+                    text: 'Si el tutorial de angg no te parece lo suficientemente claro, te tengo esta pagina. Sube el spritesheet y el XML, y los ordenara por ti en el formato de FMM. A cambio de un ligerisimo desplazamiento que no he podido arreglar, pero hey, te sirve para el catalogo.',
+                    link: '/FunkIntoFunky/SheetConverter.html'
+                }
+            ];
+
+            function createCard(card) {
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <a href="${card.link}" class="card-link">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <img src="${card.icon}" alt="${card.title} icon" class="card-icon">
+                                        ${card.title}
+                                    </h5>
+                                    <p class="card-text">${card.text}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }
+
+            function renderCards() {
+                const cardContainer = $('#card-container');
+                cards.forEach(card => {
+                    cardContainer.append(createCard(card));
+                });
+            }
+
+            renderCards();
+        });
+    </script>
+</body>
+</html>
