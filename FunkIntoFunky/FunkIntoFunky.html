@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation Frame Combiner</title>
+    <link href="/Bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .drop-zone.dragover {
+            background: #e9ecef;
+            border-color: #0d6efd;
+        }
+        #progress-container {
+            display: none;
+        }
+        .language-selector {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-selector">
+        <select id="language-select" class="form-select">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+        </select>
+    </div>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4" data-text="title">Animation Frame Combiner</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="rotate-frames">
+                    <label class="form-check-label" for="rotate-frames" data-text="rotateFrames">
+                        Rotate frames 90° clockwise
+                    </label>
+                </div>
+
+                <div class="drop-zone mb-3">
+                    <p class="mb-0" data-text="dropText">Drag and drop your ZIP file here or</p>
+                    <input type="file" id="file-input" accept=".zip" class="d-none">
+                    <button class="btn btn-primary mt-2" onclick="document.getElementById('file-input').click()" data-text="selectButton">
+                        Select File
+                    </button>
+                </div>
+
+                <div id="progress-container" class="mt-3">
+                    <div class="progress mb-2">
+                        <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <p id="status-text" class="text-center"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/Bootstrap/js/jquery-3.7.1.js"></script>
+    <script src="/Bootstrap/js/bootstrap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        const translations = {
+            en: {
+                title: "Animation Frame Combiner",
+                dropText: "Drag and drop your ZIP file here or",
+                selectButton: "Select File",
+                readingZip: "Reading ZIP file...",
+                processingAnimation: "Processing animation: ",
+                creatingDownload: "Creating download file...",
+                processComplete: "Processing complete!",
+                errorProcessing: "Error processing file: ",
+                rotateFrames: "Rotate frames 90° clockwise"
+            },
+            es: {
+                title: "Combinador de Cuadros de Animación",
+                dropText: "Arrastra y suelta tu archivo ZIP aquí o",
+                selectButton: "Seleccionar Archivo",
+                readingZip: "Leyendo archivo ZIP...",
+                processingAnimation: "Procesando animación: ",
+                creatingDownload: "Creando archivo de descarga...",
+                processComplete: "¡Procesamiento completado!",
+                errorProcessing: "Error al procesar el archivo: ",
+                rotateFrames: "Rotar cuadros 90° en sentido horario"
+            },
+            pt: {
+                title: "Combinador de Quadros de Animação",
+                dropText: "Arraste e solte seu arquivo ZIP aqui ou",
+                selectButton: "Selecionar Arquivo",
+                readingZip: "Lendo arquivo ZIP...",
+                processingAnimation: "Processando animação: ",
+                creatingDownload: "Criando arquivo para download...",
+                processComplete: "Processamento completo!",
+                errorProcessing: "Erro ao processar arquivo: ",
+                rotateFrames: "Rotacionar quadros 90° no sentido horário"
+            }
+        };
+
+        let currentLanguage = 'en';
+
+        function updateLanguage(lang) {
+            currentLanguage = lang;
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-text]').forEach(element => {
+                const textKey = element.getAttribute('data-text');
+                if (translations[lang][textKey]) {
+                    element.textContent = translations[lang][textKey];
+                }
+            });
+        }
+
+        document.getElementById('language-select').addEventListener('change', (e) => {
+            updateLanguage(e.target.value);
+        });
+
+        function getText(key, ...params) {
+            let text = translations[currentLanguage][key] || translations['en'][key];
+            params.forEach((param, index) => {
+                text = text.replace(`{${index}}`, param);
+            });
+            return text;
+        }
+
+        const dropZone = document.querySelector('.drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+        const statusText = document.getElementById('status-text');
+        const rotateCheckbox = document.getElementById('rotate-frames');
+
+        async function rotateImage(img) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = img.height;
+            canvas.height = img.width;
+            
+            ctx.translate(canvas.width, 0);
+            ctx.rotate(90 * Math.PI / 180);
+            
+            ctx.drawImage(img, 0, 0);
+            
+            return createImageBitmap(canvas);
+        }
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/zip') {
+                processZipFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                processZipFile(e.target.files[0]);
+            }
+        });
+
+        async function processZipFile(file) {
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            statusText.textContent = getText('readingZip');
+            const shouldRotate = rotateCheckbox.checked;
+
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const imageFiles = {};
+
+                for (const [filename, zipEntry] of Object.entries(zip.files)) {
+                    if (!filename.endsWith('.png')) continue;
+                    
+                    const animName = filename.replace(/\d+\.png$/, '');
+                    if (!imageFiles[animName]) {
+                        imageFiles[animName] = [];
+                    }
+                    imageFiles[animName].push({
+                        name: filename,
+                        entry: zipEntry
+                    });
+                }
+
+                const newZip = new JSZip();
+                let processedCount = 0;
+                const totalAnimations = Object.keys(imageFiles).length;
+
+                for (const [animName, files] of Object.entries(imageFiles)) {
+                    statusText.textContent = getText('processingAnimation') + animName;
+                    
+                    files.sort((a, b) => {
+                        const numA = parseInt(a.name.match(/\d+/g).pop());
+                        const numB = parseInt(b.name.match(/\d+/g).pop());
+                        return numA - numB;
+                    });
+
+                    const images = await Promise.all(files.map(async file => {
+                        const blob = await file.entry.async('blob');
+                        let img = await createImageBitmap(blob);
+                        if (shouldRotate) {
+                            img = await rotateImage(img);
+                        }
+                        return img;
+                    }));
+
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const firstImage = images[0];
+                    canvas.height = firstImage.height;
+                    canvas.width = images.reduce((sum, img) => sum + img.width, 0);
+
+                    let x = 0;
+                    for (const img of images) {
+                        ctx.drawImage(img, x, 0);
+                        x += img.width;
+                    }
+
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve));
+                    newZip.file(`${animName}.png`, blob);
+
+                    processedCount++;
+                    progressBar.style.width = `${(processedCount / totalAnimations) * 100}%`;
+                }
+
+                statusText.textContent = getText('creatingDownload');
+                const content = await newZip.generateAsync({
+                    type: 'blob',
+                    compression: 'DEFLATE'
+                });
+
+                const url = URL.createObjectURL(content);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "funky'ed_" + file.name;  // Added "funky'ed_" prefix to the filename
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                statusText.textContent = getText('processComplete');
+                progressBar.style.width = '100%';
+                progressBar.classList.add('bg-success');
+
+            } catch (error) {
+                console.error(error);
+                statusText.textContent = getText('errorProcessing') + error.message;
+                progressBar.classList.add('bg-danger');
+            }
+        }
+
+        updateLanguage('en');
+    </script>
+</body>
+</html>
