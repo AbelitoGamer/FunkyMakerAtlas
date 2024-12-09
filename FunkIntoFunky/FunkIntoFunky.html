@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funkin' To Funky!</title>
+    <title>Animation Frame Combiner</title>
     <link href="/Bootstrap/css/bootstrap.css" rel="stylesheet">
     <style>
         .drop-zone {
@@ -179,95 +179,117 @@
         });
 
         async function processZipFile(file) {
-            progressContainer.style.display = 'block';
-            progressBar.style.width = '0%';
-            statusText.textContent = getText('readingZip');
-            const shouldRotate = rotateCheckbox.checked;
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    statusText.textContent = getText('readingZip');
+    const shouldRotate = rotateCheckbox.checked;
 
-            try {
-                const zip = await JSZip.loadAsync(file);
-                const imageFiles = {};
+    try {
+        const zip = await JSZip.loadAsync(file);
+        const imageFiles = {};
 
-                for (const [filename, zipEntry] of Object.entries(zip.files)) {
-                    if (!filename.endsWith('.png')) continue;
-                    
-                    const animName = filename.replace(/\d+\.png$/, '');
-                    if (!imageFiles[animName]) {
-                        imageFiles[animName] = [];
-                    }
-                    imageFiles[animName].push({
-                        name: filename,
-                        entry: zipEntry
-                    });
-                }
-
-                const newZip = new JSZip();
-                let processedCount = 0;
-                const totalAnimations = Object.keys(imageFiles).length;
-
-                for (const [animName, files] of Object.entries(imageFiles)) {
-                    statusText.textContent = getText('processingAnimation') + animName;
-                    
-                    files.sort((a, b) => {
-                        const numA = parseInt(a.name.match(/\d+/g).pop());
-                        const numB = parseInt(b.name.match(/\d+/g).pop());
-                        return numA - numB;
-                    });
-
-                    const images = await Promise.all(files.map(async file => {
-                        const blob = await file.entry.async('blob');
-                        let img = await createImageBitmap(blob);
-                        if (shouldRotate) {
-                            img = await rotateImage(img);
-                        }
-                        return img;
-                    }));
-
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    const firstImage = images[0];
-                    canvas.height = firstImage.height;
-                    canvas.width = images.reduce((sum, img) => sum + img.width, 0);
-
-                    let x = 0;
-                    for (const img of images) {
-                        ctx.drawImage(img, x, 0);
-                        x += img.width;
-                    }
-
-                    const blob = await new Promise(resolve => canvas.toBlob(resolve));
-                    newZip.file(`${animName}.png`, blob);
-
-                    processedCount++;
-                    progressBar.style.width = `${(processedCount / totalAnimations) * 100}%`;
-                }
-
-                statusText.textContent = getText('creatingDownload');
-                const content = await newZip.generateAsync({
-                    type: 'blob',
-                    compression: 'DEFLATE'
-                });
-
-                const url = URL.createObjectURL(content);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = "funky'ed_" + file.name;  // Added "funky'ed_" prefix to the filename
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                statusText.textContent = getText('processComplete');
-                progressBar.style.width = '100%';
-                progressBar.classList.add('bg-success');
-
-            } catch (error) {
-                console.error(error);
-                statusText.textContent = getText('errorProcessing') + error.message;
-                progressBar.classList.add('bg-danger');
+        // First pass: Group files by animation name
+        for (const [filename, zipEntry] of Object.entries(zip.files)) {
+            if (!filename.endsWith('.png')) continue;
+            
+            const animName = filename.replace(/\d+\.png$/, '');
+            if (!imageFiles[animName]) {
+                imageFiles[animName] = [];
             }
+            imageFiles[animName].push({
+                name: filename,
+                entry: zipEntry
+            });
         }
+
+        const newZip = new JSZip();
+        let processedCount = 0;
+        const totalAnimations = Object.keys(imageFiles).length;
+
+        for (const [animName, files] of Object.entries(imageFiles)) {
+            statusText.textContent = getText('processingAnimation') + animName;
+            
+            // Sort files numerically
+            files.sort((a, b) => {
+                const numA = parseInt(a.name.match(/\d+/g).pop());
+                const numB = parseInt(b.name.match(/\d+/g).pop());
+                return numA - numB;
+            });
+
+            // Load all images first
+            const images = await Promise.all(files.map(async file => {
+                const blob = await file.entry.async('blob');
+                let img = await createImageBitmap(blob);
+                if (shouldRotate) {
+                    img = await rotateImage(img);
+                }
+                return img;
+            }));
+
+            // Find maximum dimensions
+            let maxWidth = 0;
+            let maxHeight = 0;
+            images.forEach(img => {
+                maxWidth = Math.max(maxWidth, img.width);
+                maxHeight = Math.max(maxHeight, img.height);
+            });
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size to accommodate all normalized frames
+            canvas.height = maxHeight;
+            canvas.width = maxWidth * images.length;
+
+            // Draw each image centered in its frame
+            images.forEach((img, index) => {
+                const x = index * maxWidth;
+                const y = (maxHeight - img.height) / 2;
+                ctx.drawImage(
+                    img,
+                    x + (maxWidth - img.width) / 2,  // Center horizontally
+                    y,  // Center vertically
+                    img.width,
+                    img.height
+                );
+
+                // Optional: Draw frame boundary for debugging
+                // ctx.strokeStyle = '#ff0000';
+                // ctx.strokeRect(x, 0, maxWidth, maxHeight);
+            });
+
+            const blob = await new Promise(resolve => canvas.toBlob(resolve));
+            newZip.file(`${animName}.png`, blob);
+
+            processedCount++;
+            progressBar.style.width = `${(processedCount / totalAnimations) * 100}%`;
+        }
+
+        statusText.textContent = getText('creatingDownload');
+        const content = await newZip.generateAsync({
+            type: 'blob',
+            compression: 'DEFLATE'
+        });
+
+        const url = URL.createObjectURL(content);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "funky'ed_" + file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        statusText.textContent = getText('processComplete');
+        progressBar.style.width = '100%';
+        progressBar.classList.add('bg-success');
+
+    } catch (error) {
+        console.error(error);
+        statusText.textContent = getText('errorProcessing') + error.message;
+        progressBar.classList.add('bg-danger');
+    }
+}
 
         updateLanguage('en');
     </script>
