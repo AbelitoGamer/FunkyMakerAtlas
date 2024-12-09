@@ -187,19 +187,44 @@
     try {
         const zip = await JSZip.loadAsync(file);
         const imageFiles = {};
+        const tempGroups = {};
 
-        // First pass: Group files by animation name
+        // First pass: Collect all PNG files and their potential base names
         for (const [filename, zipEntry] of Object.entries(zip.files)) {
             if (!filename.endsWith('.png')) continue;
             
-            const animName = filename.replace(/\d+\.png$/, '');
-            if (!imageFiles[animName]) {
-                imageFiles[animName] = [];
+            // Extract name without extension
+            const nameWithoutExt = filename.slice(0, -4);
+            
+            // Try to find a number at the end
+            const numberMatch = nameWithoutExt.match(/^(.*?)(\d+)?$/);
+            if (!numberMatch) continue;
+            
+            const [_, baseName, frameNumber] = numberMatch;
+            const normalizedBaseName = baseName.endsWith('_') || baseName.endsWith('-') 
+                ? baseName.slice(0, -1) 
+                : baseName;
+
+            // Store in temporary groups to help identify base names
+            if (!tempGroups[normalizedBaseName]) {
+                tempGroups[normalizedBaseName] = [];
             }
-            imageFiles[animName].push({
+            
+            tempGroups[normalizedBaseName].push({
                 name: filename,
+                frameNumber: frameNumber ? parseInt(frameNumber) : 0,
                 entry: zipEntry
             });
+        }
+
+        // Second pass: Process groups and create final imageFiles object
+        for (const [baseName, files] of Object.entries(tempGroups)) {
+            // If there's only one file and it has no number, skip grouping
+            if (files.length === 1 && files[0].frameNumber === 0) {
+                continue;
+            }
+
+            imageFiles[baseName] = files;
         }
 
         const newZip = new JSZip();
@@ -209,12 +234,8 @@
         for (const [animName, files] of Object.entries(imageFiles)) {
             statusText.textContent = getText('processingAnimation') + animName;
             
-            // Sort files numerically
-            files.sort((a, b) => {
-                const numA = parseInt(a.name.match(/\d+/g).pop());
-                const numB = parseInt(b.name.match(/\d+/g).pop());
-                return numA - numB;
-            });
+            // Sort files by frame number
+            files.sort((a, b) => a.frameNumber - b.frameNumber);
 
             // Load all images first
             const images = await Promise.all(files.map(async file => {
@@ -252,10 +273,6 @@
                     img.width,
                     img.height
                 );
-
-                // Optional: Draw frame boundary for debugging
-                // ctx.strokeStyle = '#ff0000';
-                // ctx.strokeRect(x, 0, maxWidth, maxHeight);
             });
 
             const blob = await new Promise(resolve => canvas.toBlob(resolve));
@@ -290,6 +307,11 @@
         progressBar.classList.add('bg-danger');
     }
 }
+
+        updateLanguage('en');
+    </script>
+</body>
+</html>
 
         updateLanguage('en');
     </script>
